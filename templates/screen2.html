@@ -1,0 +1,347 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <link href="{% static 'style_basic.css' %}" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        .active {
+            background-color: #f1f1f1;
+            color: gray;
+        }
+        .scroll {
+            height: 500px;
+            overflow: auto;
+        }
+
+    </style>
+    <script type="text/javascript">
+        let countryList = ['Europe', 'Asia', 'Africa', 'Oceania', 'North America',
+            "South America", "World"];
+
+        function changeClass(ele) {
+            ele.classList.toggle("active");
+        }
+
+        function toggle(source) {
+            var checkboxes = document.querySelectorAll('input[name="iso_code"]');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i] != source)
+                    checkboxes[i].checked = source.checked;
+            }
+            clearIso()
+        }
+
+        function submitAll() {
+            console.log('Submitted')
+            document.getElementById('iso_post').submit();
+            document.forms['iso_post'].submit();
+            document.getElementById('iso_line').submit();
+        }
+
+        function chooseContinent(ele) {
+            changeClass(ele);
+            let href = ele.href.replace('//', '/').split('/');
+            href = href[href.length - 1]
+            let current_url = window.location.href.replace('//', '/');
+            let name_to_replace = current_url.split('/')[3];
+            current_url = current_url.replace(name_to_replace, href);
+            console.log(current_url);
+            let origin = window.location.origin.replace('http:/', '');
+            window.location.href = current_url.replace(origin, '');
+            return false
+        }
+
+        function hideCountry(ele) {
+            if (ele.checked) {
+                console.log('checked')
+            }
+
+            let name = ele.value;
+			let ifrm = document.getElementById('iframe_map');
+			var innerDoc = ifrm.contentWindow.document;
+			console.log(innerDoc.getElementsByClassName('mark-text role-mark layer_0_layer_1_marks'));
+			// var texts = innerDoc.getElementsByClassName('mark-text role-mark layer_0_layer_1_marks')[0].getElementsByTagName('text');
+			var texts = innerDoc.getElementsByTagName('text');
+			for (let i = 0;i < texts.length; i++) {
+				if (texts[i].innerHTML === name) {
+					if (texts[i].style.display !== "none") {
+						texts[i].style.display = "none"
+						 }
+					else {
+					     console.log("here");
+						 texts[i].style.display = "block"
+						}
+					return
+				}
+			}
+		}
+
+		function clearIso() {
+            let iframe = document.getElementById('iframe_map').contentWindow.document.body;
+            var patt = new RegExp("mark-text role-mark layer_.+");
+            let g_el = []
+            var tmp = iframe.getElementsByTagName("g");
+            for ( var i = 0; i < tmp.length; i++ ) {
+
+                if ( patt.test(tmp[i].className.baseVal) ) {
+                    g_el.push(tmp[i]);
+                    break
+                }
+            }
+            let iso_code = document.getElementsByName('iso_code');
+			let checked = [];
+			for (let i = 0; i<iso_code.length;i++) {
+			  if (iso_code[i].checked) {checked.push(iso_code[i].value)}
+			 }
+			console.log(checked);
+		   var texts = g_el[0].getElementsByTagName('text');
+			  for (let i=0; i<texts.length; i++) {
+			  console.log(texts[i], texts[i].innerHTML, checked, texts[i].innerHTML in checked)
+				if (checked.includes(texts[i].innerHTML)) {
+				  texts[i].style.display = 'block'}
+				 else {
+				 texts[i].style.display = 'none'
+				 }
+			  }
+        }
+        function changeTrendLine(clas) {
+            let iframe = document.getElementById('iframe_map').contentWindow.document.body;
+            let div = iframe.getElementsByClassName(clas)[0];
+            console.log(iframe , div.style)
+            if (div.style.display === 'none') {
+                div.style.display = 'block'
+            }
+            else {div.style.display = 'none'}
+        }
+        function back(ele) {
+            //window.location.href = 'http://127.0.0.1:8000';
+             window.location.href = 'http://cor0na.pythonanywhere.com/';
+
+            return false
+        }
+        function updateURL(ele) {
+            // changeClass(ele)
+            let url = window.location.href;
+            url = url.replace('//', '').split('/');
+            let new_href = url[url.length - 1];
+            let href_b = url[url.length - 2];
+            let splitted_href = ele.href.split('/');
+            if (splitted_href[splitted_href.length - 1] === new_href) {
+                // if pressed the same element: return and get rid of part link
+                // ele.className = 'inactive';
+                let win = window.location.href;
+                win = win.replace('/' + new_href, '');
+                window.location.assign(win);
+                return false
+            } else if (splitted_href[splitted_href.length - 1] === href_b) {
+                // ele.className = 'inactive';
+                let win = window.location.href;
+                win = win.replace('/' + href_b, '');
+                window.location.replace(win);
+                return false
+            } else if (url.length > 4) {
+                // if already two are chosen
+                // find element by href == last of current url
+                let win = window.location.href.split('/');
+                let last_win_el = win[win.length - 1];
+                win = win.replace(last_win_el, new_href);
+                window.location.replace(win);
+                return false;
+            }
+            let href = ele.href.split('/').pop();
+            let win = window.location + '/' + href;
+            window.location.replace(win);
+            return false;
+        }
+    </script>
+</head>
+
+<body style="background-color: black">
+<section id="top" style="background-color: black">
+    <div id="top-row" class="top-nav">
+        <div class="row">
+            <div class="col-md-2 btn-group">
+                <button style="background-color: white"><a href="/" onclick="return back()" style="text-decoration: none">Map view</a>
+                </button>
+                <button>2x2box view</button>
+            </div>
+            <div class="col-md-7"></div>
+            <!-- IMPLEMENT LATEST DATE HERE-->
+            <div class="col-md-3"><h2>Latest data: {{ date }}</h2></div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="row" style="height: 100%;">
+        <div class="col-md-2">
+            <div id="mySidenav" class="sidenav">
+                <a href="World" class="{{ World }}" onclick="return chooseContinent(this)">World</a>
+                <a href="Asia"  class="{{ Asia }}" onclick="return chooseContinent(this)">Asia</a>
+                <a href="Europe" class="{{ Europe }}" onclick="return chooseContinent(this)">Europe</a>
+                <a href="Africa" class="{{ Africa }}" onclick="return chooseContinent(this)">Africa</a>
+                <a href="Oceania" class="{{ Oceania }}" onclick="return chooseContinent(this)">Oceania</a>
+                <a href="North_America" class="{{ North_America }}" onclick="return chooseContinent(this)">North America</a>
+                <a href="South_America" class="{{ South_America }}" onclick="return chooseContinent(this)">South America</a>
+            </div>
+
+            <div class="form-div-big" style="color: white;">
+                <form method="post" action="" id="iso_line">
+                    {% csrf_token %}
+                    <div style="padding-left: 20px; padding-top: 20px">
+                        <input type="checkbox" onclick="changeTrendLine('mark-group role-scope layer_1_layer_1_pathgroup')" checked name="line" value="regression">
+                        <span style="font-family: monospace; font-size: 20px; padding: 10px;" >Trend line</span><br>
+                        <input type="checkbox" onclick="changeTrendLine('mark-rule role-mark layer_0_layer_1_marks')" checked name="line" value="midX">
+                        <span style="font-family: monospace; font-size: 20px; padding: 10px;">X median</span><br>
+                        <input type="Checkbox" onclick="changeTrendLine('mark-rule role-mark layer_0_layer_2_marks')" checked name="line" value="midY">
+                        <span style="font-family: monospace; font-size: 20px; padding: 10px;">Y median</span><br>
+                    </div>
+                </form>
+            </div>
+            <div style="padding: 30px">
+                <form method="post" id="myForm">
+                    {% csrf_token %}
+                    <input type="checkbox" name="axes" style="visibility: hidden; width:1px; height: 1px;" checked value="axes">
+<!--                    <input type="submit" value="Switch axes" onclick="return switchAxes()">-->
+                    <input type="submit" value="Switch axes">
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-1">
+
+            <form method="post" id="iso_post" action="">
+                {% csrf_token %}
+                <center>
+                <input type="checkbox" onClick="toggle(this)"><span style="font-family: monospace; color: lightgrey; font-size: 14px;">
+                             All</span><br/><br>
+                </center>
+                <div class="scroll row">
+                    <div class="col-sm-6" style="padding: 0; margin: 0">
+                        {% for i in country_list_part1 %}
+                        <input type="checkbox" onclick="hideCountry(this);" name="iso_code" value="{{i}}">
+                        <span style="font-family: monospace; font-size: 14px; color: lightgrey;">
+                            {% if i == 'OWID_KOS' %}
+                            KOS
+                            {% else %}
+                            {{i}}
+                            {% endif %}
+                            <br>
+                        </span>
+                        {% endfor %}
+                    </div>
+                    <div class="col-sm-6" style="padding: 0; margin: 0">
+                        {% for i in country_list_part2 %}
+                        <input type="checkbox" onclick="hideCountry(this);" name="iso_code" value="{{i}}">
+                        <span style="font-family: monospace; font-size: 14px; color: lightgrey;">
+                            {% if i == 'OWID_KOS' %}
+                            KOS
+                            {% else %}
+                            {{i}}
+                            {% endif %}
+                        <br>
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+
+        <div class="col-md-6" style="height: 600px">
+            <div style="height: 90%; background-color: black">
+                <iframe src="{{ url }}" id='iframe_map' onload="clearIso();" webkitallowfullscreen="" mozallowfullscreen=""
+                        style="width: 675px;height: 590px;background-color: white">
+
+                </iframe>
+            </div>
+        </div>
+        <div class="main_indicator-data col-md-3" style="background-color: black">
+            <div class="indicator-data">
+                <h2>Absolute indicators</h2>
+                <ul>
+                    <li>
+                        <a class="{{ total_cases }}" href="total_cases" onclick="return updateURL(this)">Total confirmed
+                            cases</a>
+                    </li>
+                    <li>
+                        <a class="{{ new_cases }}" href="new_cases" onclick="return updateURL(this)">New
+                            confirmed cases</a>
+                    </li>
+                    <li>
+                        <a class="{{ total_deaths }}" href="total_deaths" onclick="return updateURL(this)">Total
+                            deaths</a>
+                    </li>
+                    <li>
+                        <a class=" {{ new_deaths }}" href="new_deaths" onclick="return updateURL(this)">New deaths</a>
+                    </li>
+                    <li>
+                        <a class=" {{ total_tests }}" href="total_tests" onclick="return updateURL(this)">Total
+                            tests</a>
+                    </li>
+                    <li>
+                        <a class=" {{ new_tests }}" href="new_tests" onclick="return updateURL(this)">New tests</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="indicator-data">
+
+                <h2>Per capita indicators</h2>
+                <ul>
+                    <li><a class=" {{ total_cases_per_million }}" href="total_cases_per_million"
+                           onclick="return updateURL(this)">Total confirmed cases per 1M</a></li>
+                    <li><a class=" {{ new_cases_per_million }}" href="new_cases_per_million"
+                           onclick="return updateURL(this)">New confirmed cases per 1M</a></li>
+                    <li><a class=" {{ total_deaths_per_million }}" href="total_deaths_per_million"
+                           onclick="return updateURL(this)">Total deaths per 1M</a></li>
+                    <li><a class=" {{ new_deaths_per_million }}" href="new_deaths_per_million"
+                           onclick="return updateURL(this)">New deaths per 1M</a></li>
+                    <li><a class=" {{ total_tests_per_thousand }}" href="total_tests_per_thousand"
+                           onclick="return updateURL(this)">Total tests per 1K</a></li>
+                    <li><a class=" {{ new_tests_per_thousand }}" href="new_tests_per_thousand"
+                           onclick="return updateURL(this)">New tests per 1K</a></li>
+                </ul>
+            </div>
+            <div class="indicator-data">
+                <h2>Epidemiological indicators</h2>
+                                <ul>
+                    <li>
+                        <a class="{{ tests_share }}" href="tests_share" onclick="return updateURL(this)">Share of positive tests, cumm</a>
+                    </li>
+                    <li>
+                        <a class="{{ tests_share_7d }}" href="tests_share_7d" onclick="return updateURL(this)">Share of positive tests 7d MA</a></li>
+
+                    <li>
+                        <a class="{{ case_death }}" href="case_death" onclick="return updateURL(this)">Deaths per case, cumm</a>
+                    </li>
+                    <li><a class="{{ case_death_7d }}" href="case_death_7d" onclick="return updateURL(this)">Death per case, 7d MA</a></li>
+                </ul>
+            </div>
+            <div class="indicator-data">
+                <h2>Static data</h2>
+                <ul>
+                    <li><a class=" {{ population }}" href="population" onclick="return updateURL(this)">Population</a>
+                    </li>
+                    <li><a class=" {{ population_density }}" href="population_density" onclick="return updateURL(this)">Population
+                        density</a></li>
+                    <li><a class=" {{ hospital_beds_per_thousand }}" href="hospital_beds_per_thousand"
+                           onclick="return updateURL(this)">Hospital beds per 1K</a></li>
+                    <li><a class=" {{ life_expectancy }}" href="life_expectancy" onclick="return updateURL(this)">Life
+                        expectancy</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+</body>
+
+</html>

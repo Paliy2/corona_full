@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    {% load static %}
+    <link href="{% static 'style_basic.css' %}" rel="stylesheet" type="text/css">
+
+    <style type="text/css">
+        .active {
+            background-color: #f1f1f1;
+            color: gray;
+        }
+    </style>
+
+    <script>
+        // redirect
+        if (window.location.href.replace('//', '/').split('/').length < 4) {
+            window.location.href += 'World/total_cases';
+        }
+
+        function evalSlider() {
+            var sliderValue = document.getElementById('myRange').value;
+            document.getElementById('sliderVal').innerHTML = './map' + sliderValue;
+            document.getElementById('iframe_map').src = './map' + sliderValue
+        }
+
+        function changeContinent(ele) {
+            let win = window.location.href.split('/');
+console.log(win);
+            let continent = win[5];
+            if (continent !== ele.id) {
+                win[3] = ele.id;
+                win = win.join('/');
+                console.log(win)
+                window.location.href = win;
+                return false;
+            }
+        }
+    </script>
+</head>
+
+<body style="background-color: black">
+<section id="top" style="background-color: black">
+    <div id="top-row" calss="top-nav">
+        <div class="row">
+            <div class="col-md-2 btn-group">
+                <button>Map view</button>
+                <button style="background-color: white"><a href="../2x2box/World/total_cases/total_deaths"
+                                                           style="text-decoration: none">2x2 box view</a>
+                </button>
+            </div>
+            <div class="col-md-7"></div>
+            <!-- IMPLEMENT LATEST DATE HERE-->
+            <div class="col-md-3"></h2>Latest data: {{ date }} </h2></div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="row" style="height: 100%;">
+        <div class="col-md-2">
+            <div id="mySidenav" class="sidenav">
+                <a href="#" class=" {{ World }}" id="World" onclick="return changeContinent(this)">World</a>
+                <a href="#" class=" {{ Africa }}" id="Africa" onclick="return changeContinent(this)">Africa</a>
+                <a href="#" class=" {{ Asia_and_Pacific }}" id="Asia_and_Pacific" onclick="return changeContinent(this)">Asia and Pacific</a>
+                <a href="#" class=" {{ Europe }}" id="Europe" onclick="return changeContinent(this)">Europe</a>
+                <a href="#" class=" {{ North_America }}" id="North_America" onclick="return changeContinent(this)">North America</a>
+                <a href="#" class=" {{ South_America }}" id="South_America" onclick="return changeContinent(this)">South America</a>
+
+                <img src="../static/color_data.png"
+                     style="width: 80%; height: 36%; position: absolute;  bottom: 7%;">
+            </div>
+        </div>
+        <div class="col-md-7" style="height: 600px; width: 90%;display:table">
+            <div>
+                                <iframe src="../maps" style="width:100%;height:400px;left:0;top:0; !important;"
+                                        id='iframe_map' webkitallowfullscreen="" mozallowfullscreen="">
+                                </iframe>
+            </div>
+            <div style="height: 40%; background-color: black">
+                <img src="{% static 'data_plot.png' %} " style="width: 80%; height: 250px;  bottom: 7%; padding-left: 10%">
+                <div class="slidecontainer">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3" style="background-color: black">
+                        <div class="indicator-data">
+                <h2>Absolute indicators</h2>
+                <ul>
+                    <li>
+                        <a class="{{ total_cases }}" href="total_cases" onclick="return updateURL(this)">Total confirmed
+                            cases</a>
+                    </li>
+                    <li>
+                        <a class="{{ new_cases }}" href="new_cases" onclick="return updateURL(this)">New
+                            confirmed cases</a>
+                    </li>
+                    <li>
+                        <a class="{{ total_deaths }}" href="total_deaths" onclick="return updateURL(this)">Total
+                            deaths</a>
+                    </li>
+                    <li>
+                        <a class=" {{ new_deaths }}" href="new_deaths" onclick="return updateURL(this)">New deaths</a>
+                    </li>
+                    <li>
+                        <a class=" {{ total_tests }}" href="total_tests" onclick="return updateURL(this)">Total
+                            tests</a>
+                    </li>
+                    <li>
+                        <a class=" {{ new_tests }}" href="new_tests" onclick="return updateURL(this)">New tests</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="indicator-data">
+
+                <h2>Per capita indicators</h2>
+                <ul>
+                    <li><a class=" {{ total_cases_per_million }}" href="total_cases_per_million"
+                           onclick="return updateURL(this)">Total confirmed cases per 1M</a></li>
+                    <li><a class=" {{ new_cases_per_million }}" href="new_cases_per_million"
+                           onclick="return updateURL(this)">New confirmed cases per 1M</a></li>
+                    <li><a class=" {{ total_deaths_per_million }}" href="total_deaths_per_million"
+                           onclick="return updateURL(this)">Total deaths per 1M</a></li>
+                    <li><a class=" {{ new_deaths_per_million }}" href="new_deaths_per_million"
+                           onclick="return updateURL(this)">New deaths per 1M</a></li>
+                    <li><a class=" {{ total_tests_per_thousand }}" href="total_tests_per_thousand"
+                           onclick="return updateURL(this)">Total tests per 1K</a></li>
+                    <li><a class=" {{ new_tests_per_thousand }}" href="new_tests_per_thousand"
+                           onclick="return updateURL(this)">New tests per 1K</a></li>
+                </ul>
+            </div>
+            <div class="indicator-data">
+                <h2>Epidemiological indicators</h2>
+                                <ul>
+                    <li>
+                        <a class="{{ tests_share }}" href="tests_share" onclick="return updateURL(this)">Share of positive tests, cumm</a>
+                    </li>
+                    <li>
+                        <a class="{{ tests_share_7d }}" href="tests_share_7d" onclick="return updateURL(this)">Share of positive tests 7d MA</a></li>
+
+                    <li>
+                        <a class="{{ case_death }}" href="case_death" onclick="return updateURL(this)">Deaths per case, cumm</a>
+                    </li>
+                    <li><a class="{{ case_death_7d }}" href="case_death_7d" onclick="return updateURL(this)">Death per case, 7d MA</a></li>
+                </ul>
+            </div>
+
+
+        </div>
+    </div>
+</section>
+
+</body>
+
+<style>
+    .slidecontainer {
+        width: 80%;
+        padding-left: 10%;
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        width: 400px;
+        height: 25px;
+        background: #d3d3d3;
+        outline: none;
+        opacity: 0.7;
+        -webkit-transition: .2s;
+        transition: opacity .2s;
+    }
+
+    .slider:hover {
+        opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        background: #4CAF50;
+        cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        background: #4CAF50;
+        cursor: pointer;
+    }
+</style>
+</html>
